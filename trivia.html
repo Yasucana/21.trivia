@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    #game-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 400px;
+    }
+    #question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    #options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .option:hover {
+      background: #bbb;
+    }
+    #timer {
+      font-size: 1.1em;
+      margin: 10px 0;
+    }
+    #score {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+    #next-btn {
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #next-btn:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="score">Score: 0</div>
+    <div id="timer">Time: 30</div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <button id="next-btn" style="display: none;">Next Question</button>
+  </div>
+
+  <script>
+    const questions = [
+  {
+    question: "量子力学における不確定性原理を提唱した物理学者は誰ですか？",
+    options: ["ニールス・ボーア", "アルベルト・アインシュタイン", "ヴェルナー・ハイゼンベルク", "エルヴィン・シュレーディンガー"],
+    correct: "ヴェルナー・ハイゼンベルク"
+  },
+  {
+    question: "1917年に起こったロシア革命で、ボリシェヴィキを率いた指導者は誰ですか？",
+    options: ["ウラジーミル・レーニン", "ヨシフ・スターリン", "レフ・トロツキー", "ニコライ2世"],
+    correct: "ウラジーミル・レーニン"
+  },
+  {
+    question: "地球上で最も深い海溝は何ですか？",
+    options: ["マリアナ海溝", "トンガ海溝", "日本海溝", "プエルトリコ海溝"],
+    correct: "マリアナ海溝"
+  },
+  {
+    question: "『モナリザ』を描いたレオナルド・ダ・ヴィンチの出生地はどこですか？",
+    options: ["フィレンツェ", "ミラノ", "ヴェネツィア", "ヴィンチ"],
+    correct: "ヴィンチ"
+  },
+  {
+    question: "光の速度に最も近い値はどれですか？",
+    options: ["300,000 km/s", "300,000 m/s", "3,000 km/s", "30,000 km/s"],
+    correct: "300,000 km/s"
+  },
+  {
+    question: "『1984年』というディストピア小説を書いた作家は誰ですか？",
+    options: ["ジョージ・オーウェル", "オルダス・ハクスリー", "レイ・ブラッドベリ", "フィリップ・K・ディック"],
+    correct: "ジョージ・オーウェル"
+  },
+  {
+    question: "人体で最も長い骨は何ですか？",
+    options: ["大腿骨", "脛骨", "上腕骨", "腰骨"],
+    correct: "大腿骨"
+  },
+  {
+    question: "2019年にノーベル物理学賞を受賞した、宇宙の進化と地球の位置に関する研究で知られる科学者は誰ですか？",
+    options: ["ジム・ピーブルズ", "ロジャー・ペンローズ", "アンドレア・ゲズ", "ラインハルト・ゲンツェル"],
+    correct: "ジム・ピーブルズ"
+  },
+  {
+    question: "『ハムレット』で、ハムレットが「To be, or not to be」という有名な独白を行う場面は第何幕ですか？",
+    options: ["第1幕", "第2幕", "第3幕", "第4幕"],
+    correct: "第3幕"
+  },
+  {
+    question: "地球の大気中で最も豊富な気体は何ですか？",
+    options: ["酸素", "窒素", "二酸化炭素", "アルゴン"],
+    correct: "窒素"
+  },
+  {
+    question: "古代エジプトのファラオ、ツタンカーメンの墓を発見した考古学者は誰ですか？",
+    options: ["ハワード・カーター", "フランダース・ペトリー", "ガストン・マスペロ", "ジャン＝フランソワ・シャンポリオン"],
+    correct: "ハワード・カーター"
+  },
+  {
+    question: "数学で、フェルマーの最終定理を証明したのは誰ですか？",
+    options: ["アンドリュー・ワイルズ", "グレゴリー・ペレルマン", "テレンス・タオ", "マイケル・アティヤ"],
+    correct: "アンドリュー・ワイルズ"
+  },
+  {
+    question: "世界で最も高い滝は何ですか？",
+    options: ["ナイアガラの滝", "ヴィクトリアの滝", "エンジェルフォール", "イグアスの滝"],
+    correct: "エンジェルフォール"
+  },
+  {
+    question: "『星の王子さま』を書いたフランスの作家は誰ですか？",
+    options: ["アントワーヌ・ド・サン＝テグジュペリ", "ヴィクトル・ユーゴー", "ギュスターヴ・フローベール", "エミール・ゾラ"],
+    correct: "アントワーヌ・ド・サン＝テグジュペリ"
+  },
+  {
+    question: "DNAの二重らせん構造を発見した科学者は誰ですか？",
+    options: ["ジェームズ・ワトソンとフランシス・クリック", "ライナス・ポーリング", "ロザリンド・フランクリン", "モーリス・ウィルキンス"],
+    correct: "ジェームズ・ワトソンとフランシス・クリック"
+  },
+  {
+    question: "1912年に沈没したタイタニック号の船長は誰ですか？",
+    options: ["エドワード・スミス", "チャールズ・ライトラー", "ヘンリー・ワイルド", "ウィリアム・マードック"],
+    correct: "エドワード・スミス"
+  },
+  {
+    question: "世界で最も長い川は何ですか？",
+    options: ["アマゾン川", "ナイル川", "ミシシッピ川", "長江"],
+    correct: "ナイル川"
+  },
+  {
+    question: "『罪と罰』を書いたロシアの作家は誰ですか？",
+    options: ["フョードル・ドストエフスキー", "レフ・トルストイ", "イワン・ツルゲーネフ", "アントン・チェーホフ"],
+    correct: "フョードル・ドストエフスキー"
+  },
+  {
+    question: "地球の内核は主に何で構成されていますか？",
+    options: ["鉄とニッケル", "シリカ", "マグネシウム", "アルミニウム"],
+    correct: "鉄とニッケル"
+  },
+  {
+    question: "1927年に大西洋を単独無着陸飛行で横断したパイロットは誰ですか？",
+    options: ["チャールズ・リンドバーグ", "アメリア・イアハート", "ハワード・ヒューズ", "ウィリー・ポスト"],
+    correct: "チャールズ・リンドバーグ"
+  },
+  {
+    question: "『君の名は。』というアニメ映画を監督したのは誰ですか？",
+    options: ["新海誠", "宮崎駿", "細田守", "押井守"],
+    correct: "新海誠"
+  },
+  {
+    question: "化学で、周期表の第18族に属する元素は何と呼ばれますか？",
+    options: ["アルカリ金属", "ハロゲン", "希ガス", "遷移金属"],
+    correct: "希ガス"
+  },
+  {
+    question: "アメリカ合衆国の独立宣言が採択されたのは何年ですか？",
+    options: ["1776年", "1789年", "1800年", "1812年"],
+    correct: "1776年"
+  },
+  {
+    question: "『星の降る夜』を描いた画家は誰ですか？",
+    options: ["フィンセント・ファン・ゴッホ", "クロード・モネ", "パブロ・ピカソ", "サルバドール・ダリ"],
+    correct: "フィンセント・ファン・ゴッホ"
+  },
+  {
+    question: "世界で最も人口の多い都市はどこですか？",
+    options: ["東京", "ニューヨーク", "上海", "ムンバイ"],
+    correct: "東京"
+  },
+  {
+    question: "『相対性理論』を提唱した物理学者は誰ですか？",
+    options: ["アイザック・ニュートン", "アルベルト・アインシュタイン", "スティーブン・ホーキング", "リチャード・ファインマン"],
+    correct: "アルベルト・アインシュタイン"
+  },
+  {
+    question: "ギリシャ神話で、ゼウスの妻は誰ですか？",
+    options: ["ヘラ", "アテナ", "アフロディーテ", "アルテミス"],
+    correct: "ヘラ"
+  },
+  {
+    question: "世界で最も高い建物は何ですか？（2023年現在）",
+    options: ["ブルジュ・ハリファ", "上海タワー", "アブラージュ・アル・ベイト・タワーズ", "ワン・ワールド・トレード・センター"],
+    correct: "ブルジュ・ハリファ"
+  },
+  {
+    question: "『ドン・キホーテ』を書いたスペインの作家は誰ですか？",
+    options: ["ミゲル・デ・セルバンテス", "フェデリコ・ガルシア・ロルカ", "ホルヘ・ルイス・ボルヘス", "ガブリエル・ガルシア・マルケス"],
+    correct: "ミゲル・デ・セルバンテス"
+  },
+  {
+    question: "地球の自転周期は約何時間ですか？",
+    options: ["24時間", "12時間", "48時間", "36時間"],
+    correct: "24時間"
+  }
+];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const scoreEl = document.getElementById('score');
+    const timerEl = document.getElementById('timer');
+    const nextBtn = document.getElementById('next-btn');
+
+    function startGame() {
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      const q = questions[currentQuestionIndex];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = '';
+      q.options.forEach(option => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        btn.textContent = option;
+        btn.addEventListener('click', () => selectOption(option));
+        optionsEl.appendChild(btn);
+      });
+      nextBtn.style.display = 'none';
+    }
+
+    function selectOption(selected) {
+      clearInterval(timerInterval);
+      const q = questions[currentQuestionIndex];
+      if (selected === q.correct) {
+        score += 10;
+        scoreEl.textContent = `Score: ${score}`;
+      }
+      document.querySelectorAll('.option').forEach(btn => {
+        btn.style.background = btn.textContent === q.correct ? '#4CAF50' : '#ff4444';
+        btn.style.pointerEvents = 'none';
+      });
+      nextBtn.style.display = 'block';
+    }
+
+    function startTimer() {
+      timeLeft = 30;
+      timerEl.textContent = `Time: ${timeLeft}`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.querySelectorAll('.option').forEach(btn => {
+            btn.style.pointerEvents = 'none';
+          });
+          nextBtn.style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    nextBtn.addEventListener('click', () => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+        startTimer();
+      } else {
+        questionEl.textContent = 'Game Over!';
+        optionsEl.innerHTML = '';
+        nextBtn.style.display = 'none';
+        timerEl.textContent = `Final Score: ${score}`;
+      }
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
